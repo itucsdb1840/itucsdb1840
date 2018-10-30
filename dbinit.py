@@ -21,6 +21,6 @@ def initialize(url):
 if __name__ == "__main__":
     url = os.getenv("DATABASE_URL")
     if url is None:
-        print("Usage: DATABASE_URL=url python dbinit.py", file=sys.stderr)
+        print("Usage: DATABASE_URL=url python dbinit.py")
         sys.exit(1)
     initialize(url)
