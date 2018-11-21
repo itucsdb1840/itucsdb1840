@@ -18,6 +18,13 @@ for i,row in data.iterrows():
     statement3 = "INSERT INTO ATTACKS(DATE,CITY,TGROUP,ATYPE,ATARGET,FATALITIES,INJURIES) VALUES('{date}','{city}','{gname}','{attacktype}','{target}','{fatalities}','{injuries}') ON CONFLICT DO NOTHING"\
             .format(date=date,city=row['city'],gname=row['gname'],attacktype=row['attacktype'],target=row['target'],fatalities =row['fatalities'],injuries=row['injuries'])
     INIT_STATEMENTS.append(statement3)
+    statement4 = "UPDATE CITIES SET TOTALA = TOTALA+1,TOTALF = TOTALF + {fatalities},TOTALI = TOTALI + {injuries} WHERE NAME = '{city}'"\
+        .format(city=row['city'],fatalities =row['fatalities'],injuries=row['injuries'])
+    INIT_STATEMENTS.append(statement4)
+    statement5 = "UPDATE TGROUPS SET TOTALA = TOTALA+1,TOTALF = TOTALF + {fatalities},TOTALI = TOTALI + {injuries} WHERE NAME = '{gname}'" \
+        .format(gname=row['gname'], fatalities=row['fatalities'], injuries=row['injuries'])
+    INIT_STATEMENTS.append(statement5)
+
 if __name__ == "__main__":
     #You need to delete statements.txt before running this script if it exists.
     output = open("statements.txt","a")
