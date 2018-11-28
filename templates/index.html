@@ -1,10 +1,57 @@
 <!doctype html>
 <html>
+{% extends "base.html" %}
 <title>Turkey Terrorism Database</title>
+<body id="index_body">
 
-<body>
-<a href="https://itucsdb1840.herokuapp.com/attacks">Attacks Page</a>
-<a href="https://itucsdb1840.herokuapp.com/cities">Cities Page</a>
-<a href="https://itucsdb1840.herokuapp.com/tgroups">Terrorist Groups Page</a>
+<nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="#">Logo</a>
+    </div>
+    <div class="collapse navbar-collapse" id="myNavbar">
+      <ul class="nav navbar-nav">
+        <li class="active"><a href="#">Home</a></li>
+        <li><a href="#">About</a></li>
+        <li><a href="#">Projects</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="#"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container-fluid text-center">
+  <div class="row content">
+    <div class="col-sm-2 sidenav">
+
+    </div>
+    <div class="col-sm-8 text-left">
+      <h1>Welcome to Turkey Terrorism Database</h1>
+      <hr>
+      <h3>Why was this project made?</h3>
+      <p>Placeholder</p>
+      <h3 id="About">About</h3>
+      <p>This is a non-profit project that was made to be able to extract and examine meaningful data about terrorism attacks in Turkey. The data used to create this website is in the time range 1970-2017 and was extracted from National Consortium for the Study of Terrorism and Responses to Terrorism (START).(2018). Global Terrorism Database. It was retrieved from <a href="https://www.start.umd.edu/gtd">here</a>.</p>
+      <h3 id="Contact">Contact Information</h3>
+      <p>For suggestions and everything else you can send an email to lostar16@itu.edu.tr</p>
+    </div>
+    <div class="col-sm-2 sidenav">
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="container-fluid text-center">
+  <p>Footer Text</p>
+</footer>
 </body>
 </html>
