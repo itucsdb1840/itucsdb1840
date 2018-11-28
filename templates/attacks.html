@@ -1,5 +1,37 @@
 <!doctype html>
 {% extends "base.html" %}
-<title>Hello from attacks page</title>
+{% block title %}
+Terrorism Attacks
+{% endblock %}
+
+{%block body%}
+    <div class="container container-fluid">
+    <table class="table table-striped">
+        <thead>
+            <tr style>
+                <td>Date of the attack</td>
+                <td>Attacked City</td>
+                <td>Terrorist group responsible for the attack</td>
+                <td>Attack Type</td>
+                <td>Attack Target</td>
+                <td>Fatalities</td>
+                <td>Injuries</td>
+            </tr>
+    </thead>
+    {% for element in tuples %}
+        <tr>
+            <td>{{element[1]}}</td>
+            <td>{{element[2]}}</td>
+            <td>{{element[3]}}</td>
+            <td>{{element[4]}}</td>
+            <td>{{element[5]}}</td>
+            <td>{{element[6]}}</td>
+            <td>{{element[7]}}</td>
+        </tr>
+    {% endfor %}
+
+    </table>
+    </div>
+{% endblock %}
 
 

@@ -37,7 +37,7 @@
 
 
   </style>
-
+    <title>{%block title%} {% endblock %}</title>
 </head>
 <body >
     <!-- Second navbar for search -->
@@ -67,6 +67,8 @@
         </div><!-- /.navbar-collapse -->
       </div><!-- /.container -->
     </nav><!-- /.navbar -->
+    {%block body%}
+    {% endblock %}
 
 
 

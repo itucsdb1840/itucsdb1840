@@ -38,6 +38,8 @@ def home_page():
 def attacks_page():
     connection = DatabaseConnection()
     url = os.getenv("DATABASE_URL")
+    if url is None:
+        url = 'postgres://itucs:itucspw@localhost:32768/itucsdb'
     connection.connect(url)
     attacks = connection.run_queries("SELECT * FROM ATTACKS;")
     connection.close()
@@ -48,6 +50,8 @@ def attacks_page():
 def cities_page():
     connection = DatabaseConnection()
     url = os.getenv("DATABASE_URL")
+    if url is None:
+        url = 'postgres://itucs:itucspw@localhost:32768/itucsdb'
     connection.connect(url)
     cities = connection.run_queries("SELECT * FROM CITIES;")
     connection.close()
@@ -58,6 +62,8 @@ def cities_page():
 def tgroups_page():
     connection = DatabaseConnection()
     url = os.getenv("DATABASE_URL")
+    if url is None:
+        url = 'postgres://itucs:itucspw@localhost:32768/itucsdb'
     connection.connect(url)
     tgroups = connection.run_queries("SELECT * FROM TGROUPS;")
     connection.close()
