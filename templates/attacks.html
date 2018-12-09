@@ -9,6 +9,7 @@ Terrorism Attacks
     <table class="table table-striped">
         <thead>
             <tr style>
+                <td>ID</td>
                 <td>Date of the attack</td>
                 <td>Attacked City</td>
                 <td>Terrorist group responsible for the attack</td>
@@ -20,6 +21,8 @@ Terrorism Attacks
     </thead>
     {% for element in tuples %}
         <tr>
+
+            <td>{{element[0]}}</td>
             <td>{{element[1]}}</td>
             <td>{{element[2]}}</td>
             <td>{{element[3]}}</td>

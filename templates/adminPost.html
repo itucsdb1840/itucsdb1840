@@ -1,0 +1,99 @@
+<!doctype html>
+<html>
+<head>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+    <!-- Mobile support-->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+</head>
+<body>
+
+    <nav class="navbar navbar-inverse">
+      <div class="container">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse-3">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#body"><i class="glyphicon glyphicon-screenshot" style="margin-right:0.3em;"></i>Turkey Terrorism Database</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="navbar-collapse-3">
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="">Home</a></li>
+            <li><a href="#About">About</a></li>
+            <li><a href="/attacks">Attacks</a></li>
+            <li><a href="/cities">Cities</a></li>
+            <li><a href="/tgroups">Terrorist Groups</a></li>
+            <li><a href="#Contact">Contact</a></li>
+          </ul>
+        </div><!-- /.navbar-collapse -->
+      </div><!-- /.container -->
+    </nav><!-- /.navbar -->
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-4">
+            <h2>Attacks Moderation</h2>
+            <br/>
+            <form action="/moderation" method="post">
+                Attack ID:<br/> <input type="text" name="attack_id"><br/>
+                Date:<br/> <input type="text" name="attack_date"><br/>
+                City:<br/> <input type="text" name="attack_city"><br/>
+                Terrorist Group:<br/> <input type="text" name="attack_tgroup"><br/>
+                Attack type:<br/> <input type="text" name="attack_type"><br/>
+                Attack Target:<br/> <input type="text" name="attack_target"><br/>
+                Fatalities:<br/> <input type="text" name="attack_fatalities"><br/>
+                Injuries:<br/> <input type="text" name="attack_injuries"><br/>
+                <br/>
+                <button name="action" type="submit" class="btn btn-primary btn-lg" value="attack_add">Add</button>
+                <button name="action" type="submit" class="btn btn-primary btn-lg" value="attack_update">Update</button>
+                <button name="action" type="submit" class="btn btn-primary btn-lg" value="attack_delete">Delete</button>
+            </form>
+        </div>
+        <div class="col-md-4">
+            <h2>Cities Moderation</h2>
+            <br/>
+            <form action="/moderation" method="post">
+                Name of the city:<br/> <input type="text" name="city_name"><br/>
+                Number of attacks:<br/> <input type="text" name="city_totala"><br/>
+                Number of fatalities:<br/> <input type="text" name="city_totalf"><br/>
+                Number of injuries:<br/> <input type="text" name="city_totali"><br/>
+                Most Common Attack Target:<br/> <input type="text" name="city_catype"><br/>
+                Most Common Attack Type:<br/> <input type="text" name="city_catarget"><br/>
+                <br/>
+                <button name="action" type="submit" class="btn btn-primary btn-lg" value="cities_add">Add</button>
+                <button name="action" type="submit" class="btn btn-primary btn-lg" value="cities_update">Update</button>
+                <button name="action" type="submit" class="btn btn-primary btn-lg" value="cities_delete">Delete</button>
+            </form>
+        </div>
+        <div class="col-md-4">
+            <h2>Terrorist Group Moderation</h2>
+            <br/>
+            <form action="/moderation" method="post">
+                Name of the terrorist organization:<br/> <input type="text" name="tgroup_name"><br/>
+                Number of attacks:<br/> <input type="text" name="tgroup_totala"><br/>
+                Number of fatalities:<br/> <input type="text" name="tgroup_totalf"><br/>
+                Number of injuries:<br/> <input type="text" name="tgroup_totali"><br/>
+                Most Common Attack Target:<br/> <input type="text" name="tgroup_catype"><br/>
+                Most Common Attack Type:<br/> <input type="text" name="tgroup_catarget"><br/>
+                <br/>
+                <button name="action" type="submit" class="btn btn-primary btn-lg" value="tgroup_add">Add</button>
+                <button name="action" type="submit" class="btn btn-primary btn-lg" value="tgroup_update">Update</button>
+                <button name="action" type="submit" class="btn btn-primary btn-lg" value="tgroup_delete">Delete</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
