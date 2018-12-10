@@ -82,6 +82,22 @@ class Moderation:
         self.delete_attack()
         self.add_attack()
 
+    def add_city(self):
+
+        self.connection.run_statements("INSERT INTO CITIES(NAME) VALUES('{name}') ON CONFLICT DO NOTHING ".format(name=request.form['city_name']))
+
+    def update_city(self):
+
+        self.connection.run_statements("UPDATE CITIES SET name='{new_name}' WHERE name='{name}'".format(new_name=request.form["city_new_name"],name=request.form["city_name"]))
+
+    def add_tgroup(self):
+
+        self.connection.run_statements("INSERT INTO TGROUPS(NAME) VALUES('{name}') ON CONFLICT DO NOTHING ".format(name=request.form['tgroup_name']))
+
+    def update_tgroup(self):
+
+        self.connection.run_statements("UPDATE TGROUPS SET name='{new_name}' WHERE name='{name}'".format(new_name=request.form["tgroup_new_name"],name=request.form["tgroup_name"]))
+
 
 @app.route("/")
 def home_page():
@@ -146,33 +162,7 @@ def moderation_page():
     if request.form["action"] == "attack_update":
 
         moderation.update_attack()
-        """
-        totali, totalf = connection.run_queries(
-            "SELECT TOTALF,TOTALI FROM CITIES WHERE name='{name}'".format(name=request.form["attack_city"]))
-        diffi = request.form["attack_injuries"] - totali
-        difff = request.form["attack_fatalities"] - totalf
 
-        connection.run_statements(
-            "UPDATE ATTACKS SET date={date}, city={city}, tgroup={gname}, atype={attacktype}, atarget={target}, fatalities={fatalities}, injuries={injuries} WHERE id='{id}'" \
-            .format(id=request.form["attack_id"],date=request.form["attack_date"], city=request.form["attack_city"],
-                    gname=request.form["attack_tgroup"],
-                    attacktype=request.form["attack_type"], target=request.form["attack_target"],
-                    fatalities=request.form["attack_fatalities"], injuries=request.form["attack_injuries"]))
-
-        connection.run_statements(
-            "UPDATE CITIES SET TOTALF = {difff},TOTALI = {diffi} WHERE NAME = '{city}'" \
-            .format(city=request.form["attack_city"], difff=difff,diffi=diffi))
-
-        result = connection.run_queries(
-            "SELECT TOTALF,TOTALI FROM TGROUPS WHERE name='{name}'".format(name=request.form["attack_tgroup"]))
-        diffi = request.form["attack_injuries"] - totali
-        difff = request.form["attack_fatalities"] - totalf
-
-        connection.run_statements(
-            "UPDATE TGROUPS SET TOTALF = {difff},TOTALI = {diffi} WHERE NAME = '{gname}'" \
-            .format(gname=request.form["attack_tgroup"], diffi=diffi,difff=difff))
-        """
-    connection = moderation.connection
     # Delete an attack
     if request.form["action"] == "attack_delete":
 
@@ -180,23 +170,23 @@ def moderation_page():
 
     # Add a new City
     if request.form["action"] == "cities_add":
-        connection.run_statements("INSERT INTO CITIES(NAME) VALUES('{name}') ON CONFLICT DO NOTHING ".format(name=request.form['city_name']))
+
+        moderation.add_city()
 
     # Update an existing city
     if request.form["action"] == "cities_update":
-        connection.run_statements("UPDATE CITIES SET name='{new_name}' WHERE name='{name}'".format(new_name=request.form["city_new_name"],name=request.form["city_name"]))
 
-    # Delete a city
-    if request.form["action"] == "cities_delete":
-        connection.run_statements("DELETE FROM CITIES WHERE name='{name}'".format(name=request.form["city_name"]))
+        moderation.update_city()
 
     if request.form["action"] == "tgroup_add":
-        print('NOT IMPLEMENTED')
-    if request.form["action"] == "tgroup_update":
-        print('NOT IMPLEMENTED')
-    if request.form["action"] == "tgroup_delete":
-        print('NOT IMPLEMENTED')
 
+        moderation.add_tgroup()
+
+    if request.form["action"] == "tgroup_update":
+
+        moderation.update_tgroup()
+
+    connection = moderation.connection
     cities = connection.run_queries("SELECT name FROM CITIES")
     # Since there are changes the tables need to be updated after each moderation
     for c, in cities:
@@ -249,7 +239,6 @@ def moderation_page():
 
     connection.commit()
     connection.close()
-
     return render_template('adminPost.html')
 
 
