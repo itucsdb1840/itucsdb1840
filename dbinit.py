@@ -20,7 +20,7 @@ def initialize(url):
         cursor = connection.cursor()
         for statement in INIT_STATEMENTS:
             cursor.execute(statement)
-
+        cursor.execute("DELETE FROM TGROUPS WHERE name='nan';") # Delete nan data
         # CATARGET and CATYPE calculations for cities
         cursor.execute("SELECT name FROM CITIES;")
         cities = cursor.fetchall()

@@ -5,6 +5,82 @@ Terrorism Attacks
 {% endblock %}
 
 {%block body%}
+    <div class="container-fluid">
+        <h3>Filtering Options:<br></h3>
+        <div class="row">
+            <form action="/filter" method="post">
+            <div class="col-md-3">
+                <h4> Timespan: <br></h4>
+                        <label for="ts">Start:</label>
+                        <select class=form-control name="timespan_start" id="ts">
+                    {% for year in years %}
+                        <option value="{{year}}">{{year}}</option>
+                    {% endfor %}
+                    </select>
+                    <br>
+                    <label for="te">End:</label>
+                    <select class=form-control name="timespan_end" id="te">
+                    {% for year in years %}
+                        <option value="{{year}}">{{year}}</option>
+                    {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                <h4> Sort the results by: <br></h4>
+                    <input class="form-check-input" type="radio" name="ordering" id="radio1" value="id" checked>
+                    <label class="form-check-label" for="radio1">
+                        ID value
+                    </label>
+                    <input class="form-check-input" type="radio" name="ordering" id="radio2" value="date">
+                    <label class="form-check-label" for="radio2">
+                        Date
+                    </label>
+                    <input class="form-check-input" type="radio" name="ordering" id="radio3" value="city">
+                    <label class="form-check-label" for="radio3">
+                        City
+                    </label>
+                    <input class="form-check-input" type="radio" name="ordering" id="radio4" value="tgroup">
+                    <label class="form-check-label" for="radio4">
+                        Attacker
+                    </label>
+                    <br>
+                    <input class="form-check-input" type="radio" name="ordering" id="radio5" value="atype">
+                    <label class="form-check-label" for="radio5">
+                        Attack Type
+                    </label>
+                    <input class="form-check-input" type="radio" name="ordering" id="radio6" value="atarget">
+                    <label class="form-check-label" for="radio6">
+                        Attack_Tarrget
+                    </label>
+                    <input class="form-check-input" type="radio" name="ordering" id="radio7" value="fatalities">
+                    <label class="form-check-label" for="radio7">
+                        Fatalities
+                    </label>
+                    <input class="form-check-input" type="radio" name="ordering" id="radio8" value="injuries">
+                    <label class="form-check-label" for="radio8">
+                        Injuries
+                    </label>
+                </div>
+                <div class="col-md-3">
+                <h4> Extra options: <br></h4>
+                    <input class="form-check-input" type="checkbox" value="1" name="hide_unknown" id="hide_unknown">
+                    <label for="hide_unknown">Hide attacks which have unkown attackers</label>
+                    <br>
+                    <input class="form-check-input" type="checkbox" value="1" name="hide_failed" id="hide_failed">
+                    <label for="hide_failed">Hide attack which have failed(0 fatalities and 0 injuries)</label>
+                </div>
+                <div class="col-md-3">
+                    <button name="action" type="submit" class="btn btn-primary btn-lg" value="filter" style="margin-left:125px;padding:25px">Apply Filters</button>
+                </div>
+
+            </form>
+            </div>
+
+        </div>
+
+    </div>
+    <br>
+    <br>
     <div class="container container-fluid">
     <table class="table table-striped">
         <thead>

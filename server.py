@@ -112,8 +112,11 @@ def attacks_page():
         url = 'postgres://itucs:itucspw@localhost:32768/itucsdb'
     connection.connect(url)
     attacks = connection.run_queries("SELECT * FROM ATTACKS;")
+    years = [""]
+    for x in xrange(1970,2018):
+        years.append(x)
     connection.close()
-    return render_template('attacks.html',tuples=attacks)
+    return render_template('attacks.html',tuples=attacks,years=years)
 
 
 @app.route("/cities")
@@ -240,6 +243,39 @@ def moderation_page():
     connection.commit()
     connection.close()
     return render_template('adminPost.html')
+
+
+@app.route("/filter",methods=['POST'])
+def filter_page():
+
+    #  If we close the connection without committing we can filter our tables anyway we want and it will return to it's original state
+    connection = DatabaseConnection()
+    url = os.getenv("DATABASE_URL")
+    if url is None:
+        url = 'postgres://itucs:itucspw@localhost:32768/itucsdb'
+    connection.connect(url)
+
+    # Timespan Filter
+    if request.form["timespan_start"] != "":
+        connection.run_statements("DELETE FROM ATTACKS WHERE date<'{year}-01-01'".format(year=request.form["timespan_start"]))
+    if request.form["timespan_end"] != "":
+        connection.run_statements(
+            "DELETE FROM ATTACKS WHERE date>'{year}-12-31'".format(year=request.form["timespan_end"]))
+
+    # Extra Filters (we use .get as these are optional)
+
+    if request.form.get("hide_unknown") == "1":
+        connection.run_statements("DELETE FROM ATTACKS WHERE tgroup='Unknown'")
+    if request.form.get("hide_failed") == "1":
+        connection.run_statements("DELETE FROM ATTACKS WHERE fatalities=0 and injuries=0")
+
+    # Ordering Filter
+    attacks = connection.run_queries("SELECT * FROM ATTACKS ORDER BY {value} DESC".format(value=request.form["ordering"]))
+    years = ['']
+
+    for x in xrange(1970, 2018):
+        years.append(x)
+    return render_template('attacks.html',tuples=attacks,years=years)
 
 
 if __name__ == "__main__":
