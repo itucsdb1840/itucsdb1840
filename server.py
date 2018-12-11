@@ -1,4 +1,4 @@
-from flask import Flask,render_template,request,redirect
+from flask import Flask,render_template,request
 import os
 
 import psycopg2 as dbapi2
@@ -99,9 +99,25 @@ class Moderation:
         self.connection.run_statements("UPDATE TGROUPS SET name='{new_name}' WHERE name='{name}'".format(new_name=request.form["tgroup_new_name"],name=request.form["tgroup_name"]))
 
 
-@app.route("/")
+@app.route("/",methods=['GET', 'POST'])
 def home_page():
-    return render_template('index.html')
+    if request.method == 'POST':
+        content = request.form.get("contact")
+        # Input validation to avoid injections
+        content.replace("'", "")
+        content.replace("(", "")
+        content.replace(")", "")
+        content.replace(";", "")
+        connection = DatabaseConnection()
+        url = os.getenv("DATABASE_URL")
+        if url is None:
+            url = 'postgres://itucs:itucspw@localhost:32768/itucsdb'
+        connection.connect(url)
+        connection.run_statements("INSERT INTO SUGGESTIONS(CONTENT) VALUES('{content}')".format(content=content))
+        connection.commit()
+        return render_template('index.html')
+    else:
+        return render_template('index.html')
 
 
 @app.route("/attacks")
