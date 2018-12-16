@@ -118,7 +118,7 @@ def home_page():
             content.replace(";", "")
             connection.run_statements("INSERT INTO SUGGESTIONS(CONTENT) VALUES('{content}')".format(content=content))
             connection.commit()
-        if request.form.get("action")=="login":
+        if request.form.get("action")=="Login":
 
             UserInfo = connection.run_queries(
                 "SELECT * FROM USERS WHERE username='{username}' AND password='{password}'".format(
@@ -128,14 +128,34 @@ def home_page():
                 session["username"] = userTuple[0]
                 session["password"] = userTuple[1]
                 session["logged"] = True
-                session["pp"] = "xd"
+                session["pp"] = None
             else:
                 session["logged"] = False
+        signFail = False
+        if request.form.get("action")=="Sign up":
 
-        return render_template('index.html',logged=session["logged"])
+            UserInfo = connection.run_queries(
+                "SELECT * FROM USERS WHERE username='{username}' AND password='{password}'".format(
+                    username=request.form.get("username"), password=request.form.get("password")))
+            if UserInfo == []:
+                username = request.form.get("username")
+                password = request.form.get("password")
+                unwanted = ["(", ")", ";"]
+                for element in unwanted:
+                    if element in username or element in password:
+                        signFail = True
+                if not signFail:
+                    session["username"] = username
+                    session["password"] = password
+                    session["logged"] = True
+                    session["pp"] = None
+                    connection.run_statements("INSERT INTO USERS(username,password) VALUES('{username}','{password}')".format(username=username,password=password))
+                    connection.commit()
+
+        return render_template('index.html',logged=session["logged"],signFail = signFail)
     else:
 
-        return render_template('index.html')
+        return render_template('index.html',signFail = False)
 
 
 @app.route("/attacks")
@@ -332,6 +352,8 @@ def logout_page():
     session["username"] = None
     session["password"] = None
     return redirect("/")
+
+
 if __name__ == "__main__":
     app.run()
 
