@@ -10,9 +10,6 @@ Turkey Terrorism Database
   function alertUser(){
  alert("Suggestion sent!");
  }
- function signUpFail(){
- alert("Either this user exists or your input has invalid characters!)
- }
 </script>
 {% endblock %}
 
@@ -25,11 +22,7 @@ Turkey Terrorism Database
     <div class="col-sm-8 text-left">
       <h1>Welcome to Turkey Terrorism Database</h1>
       <hr>
-      <h3>Why was this project made?</h3>
-      <p>Placeholder</p>
-      {% if signFail %}
-        <script type="text/javascript">window.onload = signUpFail();</script>
-      {%endif%}
+
     {% if not session["logged"] %}
 
 

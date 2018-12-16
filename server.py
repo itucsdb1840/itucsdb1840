@@ -3,10 +3,8 @@ import os
 import base64
 
 import psycopg2 as dbapi2
-UPLOAD_FOLDER = '/static/'
 app = Flask(__name__)
 app.secret_key = "2C70E12B7A0646F92279F427C7B38E7334D8E5389CFF167A1DC30E73F826B683"
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
 def imageToByte(image):
@@ -206,7 +204,7 @@ def attacks_page():
     connection.connect(url)
     attacks = connection.run_queries("SELECT * FROM ATTACKS;")
     years = [""]
-    for x in xrange(1970,2018):
+    for x in range(1970,2018):
         years.append(x)
     connection.close()
     return render_template('attacks.html',tuples=attacks,years=years)
@@ -375,7 +373,7 @@ def filter_page():
     attacks = connection.run_queries("SELECT * FROM ATTACKS ORDER BY {value} DESC".format(value=request.form["ordering"]))
     years = ['']
 
-    for x in xrange(1970, 2018):
+    for x in range(1970, 2018):
         years.append(x)
     return render_template('attacks.html',tuples=attacks,years=years)
 
@@ -399,15 +397,18 @@ def profile_page():
         return render_template("profile.html")
     if request.method == 'GET':
         pic, = connection.run_queries("SELECT profilePic FROM USERS WHERE username='{username}'".format(username=session["username"]))
-        session["hasPic"] = True
+        session["hasPic"] = False
+
         if pic[0] is not None:
             byteToImage(pic[0])
             session["hasPic"] = True
-            try:
-                if session['image'] == 0:
-                    session['image'] = session['image'] + 1
-            except KeyError:
-                session['image'] = 0
+        try:
+
+            session['image'] = session['image'] + 1
+
+        except KeyError:
+            session['image'] = 0
+
         return render_template("profile.html")
 
 

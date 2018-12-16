@@ -24,7 +24,7 @@ My Profile
             {%if session["hasPic"]%}
                 <img src="static/user_pp.png?connected='{{session['image']}}'"/>
             {%else%}
-                <img src="static/default_pp.png">
+                <img src="static/default_pp.png?refresh={{session['image']}}">
             {%endif%}
             </div>
         <br>
