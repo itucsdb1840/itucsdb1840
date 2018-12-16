@@ -86,19 +86,44 @@ class Moderation:
     def add_city(self):
 
         self.connection.run_statements("INSERT INTO CITIES(NAME) VALUES('{name}') ON CONFLICT DO NOTHING ".format(name=request.form['city_name']))
+        self.connection.commit()
 
     def update_city(self):
 
         self.connection.run_statements("UPDATE CITIES SET name='{new_name}' WHERE name='{name}'".format(new_name=request.form["city_new_name"],name=request.form["city_name"]))
+        self.connection.commit()
+
+    def delete_city(self):
+        attacks = self.connection.run_queries("SELECT tgroup,fatalities,injuries FROM ATTACKS WHERE city='{city}'".format(city=request.form['city_name']))
+        for attack in attacks:
+            tgroup,fatalities,injuries = attack
+            self.connection.run_statements("UPDATE TGROUPS SET totala = totala-1, totalf = totalf - {fatalities}, totali = totali - {injuries} WHERE name = '{tgroup}'"
+                                        .format(tgroup=tgroup,fatalities=fatalities,injuries=injuries))
+            self.connection.run_statements("DELETE FROM CITIES WHERE name='{city}'".format(city=request.form["city_name"]))
+        self.connection.commit()
 
     def add_tgroup(self):
 
         self.connection.run_statements("INSERT INTO TGROUPS(NAME) VALUES('{name}') ON CONFLICT DO NOTHING ".format(name=request.form['tgroup_name']))
+        self.connection.commit()
 
     def update_tgroup(self):
 
         self.connection.run_statements("UPDATE TGROUPS SET name='{new_name}' WHERE name='{name}'".format(new_name=request.form["tgroup_new_name"],name=request.form["tgroup_name"]))
+        self.connection.commit()
 
+    def delete_tgroup(self):
+
+        attacks = self.connection.run_queries(
+            "SELECT city,fatalities,injuries FROM ATTACKS WHERE tgroup='{tgroup}'".format(tgroup=request.form['tgroup_name']))
+        for attack in attacks:
+            city, fatalities, injuries = attack
+            self.connection.run_statements(
+                "UPDATE CITIES SET totala = totala-1, totalf = totalf - {fatalities}, totali = totali - {injuries} WHERE name = '{city}'"
+                .format(city=city, fatalities=fatalities, injuries=injuries))
+            self.connection.run_statements(
+                "DELETE FROM tgroups WHERE name='{tgroup}'".format(tgroup=request.form["tgroup_name"]))
+        self.connection.commit()
 
 
 @app.route("/",methods=['GET', 'POST'])
@@ -111,7 +136,7 @@ def home_page():
     if request.method == 'POST':
         content = request.form.get("contact")
         # Input validation to avoid injections
-        if content is not None:
+        if content is not None or "":
             content.replace("'", "")
             content.replace("(", "")
             content.replace(")", "")
@@ -135,14 +160,14 @@ def home_page():
         if request.form.get("action")=="Sign up":
 
             UserInfo = connection.run_queries(
-                "SELECT * FROM USERS WHERE username='{username}' AND password='{password}'".format(
-                    username=request.form.get("username"), password=request.form.get("password")))
+                "SELECT * FROM USERS WHERE username='{username}'".format(
+                    username=request.form.get("username")))
             if UserInfo == []:
                 username = request.form.get("username")
                 password = request.form.get("password")
                 unwanted = ["(", ")", ";"]
                 for element in unwanted:
-                    if element in username or element in password:
+                    if element in username or element in password or username=="":
                         signFail = True
                 if not signFail:
                     session["username"] = username
@@ -235,6 +260,11 @@ def moderation_page():
 
         moderation.update_city()
 
+    # Delete a city
+    if request.form["action"] == "cities_delete":
+
+        moderation.delete_city()
+
     if request.form["action"] == "tgroup_add":
 
         moderation.add_tgroup()
@@ -242,6 +272,10 @@ def moderation_page():
     if request.form["action"] == "tgroup_update":
 
         moderation.update_tgroup()
+
+    if request.form["action"] == "tgroup_delete":
+
+        moderation.delete_tgroup()
 
     connection = moderation.connection
     cities = connection.run_queries("SELECT name FROM CITIES")

@@ -10,6 +10,9 @@ Turkey Terrorism Database
   function alertUser(){
  alert("Suggestion sent!");
  }
+ function signUpFail(){
+ alert("Either this user exists or your input has invalid characters!)
+ }
 </script>
 {% endblock %}
 
@@ -24,10 +27,12 @@ Turkey Terrorism Database
       <hr>
       <h3>Why was this project made?</h3>
       <p>Placeholder</p>
-
+      {% if signFail %}
+        <script type="text/javascript">window.onload = signUpFail();</script>
+      {%endif%}
     {% if not session["logged"] %}
 
-      <div class="container" id="loginFlow">
+
         <h3>User Login</h3>
         <form id="login" method="post" name="loginform" action="/" }>
           <label>User Name:</label><br>
@@ -37,7 +42,7 @@ Turkey Terrorism Database
           <input name="action" type="submit" class="btn btn-primary btn-lg" value="Login" />
           <input name="action" type="submit" class="btn btn-primary btn-lg" value="Sign up" />
         </form>
-      </div>
+
       {% endif %}
       <h3 id="About">About</h3>
       <p>This is a non-profit project that was made to be able to extract and examine meaningful data about terrorism attacks in Turkey. The data used to create this website is in the time range 1970-2017 and was extracted from National Consortium for the Study of Terrorism and Responses to Terrorism (START).(2018). Global Terrorism Database. It was retrieved from <a href="https://www.start.umd.edu/gtd">here</a>.</p>
