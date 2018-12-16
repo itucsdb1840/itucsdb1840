@@ -5,5 +5,42 @@ My Profile
 {% endblock %}
 
 {%block body%}
+<div class="container">
+    <br>
+    <div class="row justify-content-md-center">
+        <div class="col" style="margin-left:45%;">
+    <h3>My Profile</h3>
+        </div>
+    </div>
+    <br>
+    <div class="row justify-content-md-center">
+        <div class="col">
+            <h4>Your Username : {{session["username"]}}</h4>
+        </div>
+    </div>
+    <div class="row justify-content-md-center">
+        <div class="col">
+                <h3>Your Current Profile picture:</h3><br>
+            {%if session["hasPic"]%}
+                <img src="static/user_pp.png?connected='{{session['image']}}'"/>
+            {%else%}
+                <img src="static/default_pp.png">
+            {%endif%}
+            </div>
+        <br>
+        <div class="col">
+            <div class="form-group" >
+                <form action="/profile" method="post" enctype = "multipart/form-data">
+                    <label for="pp">Upload a profile picture</label>
+                    <input type="file" id="pp" name="profilePic" accept="image/png" class="form-control-file">
+                    <br>
+                    <button type="submit" name="action" value="upload" class="btn btn-primary btn-lg">Upload</button>
+                </form>
+            </div>
+        </div>
 
+
+    </div>
+</div>
+</div>
 {% endblock %}

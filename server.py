@@ -1,9 +1,23 @@
 from flask import Flask,render_template,request,redirect,session
 import os
+import base64
 
 import psycopg2 as dbapi2
+UPLOAD_FOLDER = '/static/'
 app = Flask(__name__)
 app.secret_key = "2C70E12B7A0646F92279F427C7B38E7334D8E5389CFF167A1DC30E73F826B683"
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+
+def imageToByte(image):
+    return bytearray(base64.b64encode(image.read()))
+
+
+def byteToImage(bytea):
+    f = open("static/user_pp.png",'wb')
+    f.write(base64.b64decode(bytea))
+    f.close()
+
 
 
 class DatabaseConnection:
@@ -374,9 +388,26 @@ def profile_page():
         url = 'postgres://itucs:itucspw@localhost:32768/itucsdb'
     connection.connect(url)
     if request.method == 'POST':
-
+        pic =request.files["profilePic"]
+        if pic is None or pic.filename == '':
+            return render_template("profile.html")
+        b = imageToByte(pic)
+        connection.run_statements("UPDATE USERS SET profilePic = '{BLOB}' WHERE username='{username}'".format(BLOB=b,username=session["username"]))
+        connection.commit()
+        byteToImage(b)
+        session['image']= session['image']+1
         return render_template("profile.html")
     if request.method == 'GET':
+        pic, = connection.run_queries("SELECT profilePic FROM USERS WHERE username='{username}'".format(username=session["username"]))
+        session["hasPic"] = True
+        if pic[0] is not None:
+            byteToImage(pic[0])
+            session["hasPic"] = True
+            try:
+                if session['image'] == 0:
+                    session['image'] = session['image'] + 1
+            except KeyError:
+                session['image'] = 0
         return render_template("profile.html")
 
 
