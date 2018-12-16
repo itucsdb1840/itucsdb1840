@@ -1,8 +1,9 @@
-from flask import Flask,render_template,request
+from flask import Flask,render_template,request,redirect,session
 import os
 
 import psycopg2 as dbapi2
 app = Flask(__name__)
+app.secret_key = "2C70E12B7A0646F92279F427C7B38E7334D8E5389CFF167A1DC30E73F826B683"
 
 
 class DatabaseConnection:
@@ -99,24 +100,41 @@ class Moderation:
         self.connection.run_statements("UPDATE TGROUPS SET name='{new_name}' WHERE name='{name}'".format(new_name=request.form["tgroup_new_name"],name=request.form["tgroup_name"]))
 
 
+
 @app.route("/",methods=['GET', 'POST'])
 def home_page():
+    connection = DatabaseConnection()
+    url = os.getenv("DATABASE_URL")
+    if url is None:
+        url = 'postgres://itucs:itucspw@localhost:32768/itucsdb'
+    connection.connect(url)
     if request.method == 'POST':
         content = request.form.get("contact")
         # Input validation to avoid injections
-        content.replace("'", "")
-        content.replace("(", "")
-        content.replace(")", "")
-        content.replace(";", "")
-        connection = DatabaseConnection()
-        url = os.getenv("DATABASE_URL")
-        if url is None:
-            url = 'postgres://itucs:itucspw@localhost:32768/itucsdb'
-        connection.connect(url)
-        connection.run_statements("INSERT INTO SUGGESTIONS(CONTENT) VALUES('{content}')".format(content=content))
-        connection.commit()
-        return render_template('index.html')
+        if content is not None:
+            content.replace("'", "")
+            content.replace("(", "")
+            content.replace(")", "")
+            content.replace(";", "")
+            connection.run_statements("INSERT INTO SUGGESTIONS(CONTENT) VALUES('{content}')".format(content=content))
+            connection.commit()
+        if request.form.get("action")=="login":
+
+            UserInfo = connection.run_queries(
+                "SELECT * FROM USERS WHERE username='{username}' AND password='{password}'".format(
+                    username=request.form.get("username"), password=request.form.get("password")))
+            if UserInfo != []:
+                userTuple = UserInfo[0]
+                session["username"] = userTuple[0]
+                session["password"] = userTuple[1]
+                session["logged"] = True
+                session["pp"] = "xd"
+            else:
+                session["logged"] = False
+
+        return render_template('index.html',logged=session["logged"])
     else:
+
         return render_template('index.html')
 
 
@@ -294,6 +312,26 @@ def filter_page():
     return render_template('attacks.html',tuples=attacks,years=years)
 
 
+@app.route("/profile",methods=['POST','GET'])
+def profile_page():
+    connection = DatabaseConnection()
+    url = os.getenv("DATABASE_URL")
+    if url is None:
+        url = 'postgres://itucs:itucspw@localhost:32768/itucsdb'
+    connection.connect(url)
+    if request.method == 'POST':
+
+        return render_template("profile.html")
+    if request.method == 'GET':
+        return render_template("profile.html")
+
+
+@app.route("/logout")
+def logout_page():
+    session["logged"] = False
+    session["username"] = None
+    session["password"] = None
+    return redirect("/")
 if __name__ == "__main__":
     app.run()
 

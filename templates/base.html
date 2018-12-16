@@ -34,8 +34,8 @@
       padding: 15px;
     }
 
-
   </style>
+    {% block head %}{% endblock %}
     <title>{%block title%} {% endblock %}</title>
 </head>
 <body >
@@ -61,6 +61,12 @@
             <li><a href="/cities">Cities</a></li>
             <li><a href="/tgroups">Terrorist Groups</a></li>
             <li><a href="/#Contact">Contact</a></li>
+              {%if session["logged"] %}
+              <li><a href="/profile">My Profile</a></li>
+              <li><a href="/logout">Log Out</a></li>
+              {%else%}
+              <li><a href="/signin">Sign in</a></li>
+              {%endif%}
           </ul>
         </div><!-- /.navbar-collapse -->
       </div><!-- /.container -->
