@@ -92,8 +92,57 @@ class Moderation:
 
     def update_attack(self):
 
-        self.delete_attack()
-        self.add_attack()
+        city, fatalities, injuries, tgroup = self.connection.run_queries(
+            "SELECT city,fatalities,injuries,tgroup FROM ATTACKS where id={id};".format(id=request.form["attack_id"]))[
+            0]
+        difference_fatalities = fatalities - int(request.form["attack_fatalities"])
+        difference_injuries = injuries - int(request.form["attack_injuries"])
+        if city == request.form["attack_city"] and tgroup == request.form["attack_tgroup"]:
+            self.connection.run_statements(
+                "UPDATE CITIES SET TOTALF = TOTALF - {fatalities},TOTALI =  TOTALI - {injuries}  WHERE NAME = '{city}'" \
+                    .format(fatalities=difference_fatalities, injuries = difference_injuries,city = city))
+            self.connection.run_statements(
+                "UPDATE TGROUPS SET TOTALF = TOTALF - {fatalities},TOTALI =  TOTALI - {injuries}  WHERE NAME = '{tgroup}'" \
+                    .format(fatalities=difference_fatalities, injuries=difference_injuries, tgroup=tgroup))
+        if city != request.form["attack_city"] and tgroup == request.form["attack_tgroup"]:
+            self.connection.run_statements(
+                "UPDATE CITIES SET TOTALA = TOTALA-1,TOTALF = TOTALF - {fatalities},TOTALI =  TOTALI - {injuries}  WHERE NAME = '{city}'" \
+                    .format(fatalities=fatalities, injuries=injuries, city=city))
+            self.connection.run_statements(
+                "UPDATE CITIES SET TOTALA = TOTALA+1,TOTALF = TOTALF + {fatalities},TOTALI =  TOTALI + {injuries}  WHERE NAME = '{city}'" \
+                    .format(fatalities=request.form["attack_fatalities"], injuries=request.form["attack_injuries"], city=request.form["attack_city"]))
+            self.connection.run_statements(
+                "UPDATE TGROUPS SET TOTALF = TOTALF - {fatalities},TOTALI =  TOTALI - {injuries}  WHERE NAME = '{tgroup}'" \
+                    .format(fatalities=difference_fatalities, injuries=difference_injuries, tgroup=tgroup))
+        if city == request.form["attack_city"] and tgroup != request.form["attack_tgroup"]:
+            self.connection.run_statements(
+                "UPDATE TGROUPS SET TOTALA = TOTALA-1,TOTALF = TOTALF - {fatalities},TOTALI =  TOTALI - {injuries}  WHERE NAME = '{tgroup}'" \
+                    .format(fatalities=fatalities, injuries=injuries, tgroup=tgroup))
+            self.connection.run_statements(
+                "UPDATE TGROUPS SET TOTALA = TOTALA+1,TOTALF = TOTALF + {fatalities},TOTALI =  TOTALI + {injuries}  WHERE NAME = '{tgroup}'" \
+                    .format(fatalities=request.form["attack_fatalities"], injuries=request.form["attack_injuries"], tgroup=request.form["attack_tgroup"]))
+            self.connection.run_statements(
+                "UPDATE CITIES SET TOTALF = TOTALF - {fatalities},TOTALI =  TOTALI - {injuries}  WHERE NAME = '{city}'" \
+                    .format(fatalities=difference_fatalities, injuries=difference_injuries, city=city))
+        if city != request.form["attack_city"] and tgroup != request.form["attack_tgroup"]:
+            self.connection.run_statements(
+                "UPDATE CITIES SET TOTALA = TOTALA-1,TOTALF = TOTALF - {fatalities},TOTALI =  TOTALI - {injuries}  WHERE NAME = '{city}'" \
+                    .format(fatalities=fatalities, injuries=injuries, city=city))
+            self.connection.run_statements(
+                "UPDATE CITIES SET TOTALA = TOTALA+1,TOTALF = TOTALF + {fatalities},TOTALI =  TOTALI + {injuries}  WHERE NAME = '{city}'" \
+                    .format(fatalities=request.form["attack_fatalities"], injuries=request.form["attack_injuries"],
+                            city=request.form["attack_city"]))
+            self.connection.run_statements(
+                "UPDATE TGROUPS SET TOTALA = TOTALA-1,TOTALF = TOTALF - {fatalities},TOTALI =  TOTALI - {injuries}  WHERE NAME = '{tgroup}'" \
+                    .format(fatalities=fatalities, injuries=injuries, tgroup=tgroup))
+            self.connection.run_statements(
+                "UPDATE TGROUPS SET TOTALA = TOTALA+1,TOTALF = TOTALF + {fatalities},TOTALI =  TOTALI + {injuries}  WHERE NAME = '{tgroup}'" \
+                    .format(fatalities=request.form["attack_fatalities"], injuries=request.form["attack_injuries"],
+                            tgroup=request.form["attack_tgroup"]))
+        self.connection.run_statements("UPDATE ATTACKS SET date='{date}',city='{city}',tgroup='{tgroup}',atype='{atype}',atarget='{atarget}',fatalities='{fatalities}',injuries='{injuries}' WHERE id={id}"
+                                       .format(date=request.form["attack_date"],city=request.form["attack_city"],tgroup=request.form["attack_tgroup"],atype=request.form["attack_type"]
+                                               ,atarget=request.form["attack_target"],fatalities=request.form["attack_fatalities"],injuries=request.form["attack_injuries"],id=request.form["attack_id"]))
+        self.connection.commit()
 
     def add_city(self):
 
@@ -156,18 +205,24 @@ def home_page():
             connection.run_statements("INSERT INTO SUGGESTIONS(CONTENT) VALUES('{content}')".format(content=content))
             connection.commit()
         if request.form.get("action")=="Login":
-
-            UserInfo = connection.run_queries(
-                "SELECT * FROM USERS WHERE username='{username}' AND password='{password}'".format(
-                    username=request.form.get("username"), password=request.form.get("password")))
-            if UserInfo != []:
-                userTuple = UserInfo[0]
-                session["username"] = userTuple[0]
-                session["password"] = userTuple[1]
-                session["logged"] = True
-                session["pp"] = None
-            else:
-                session["logged"] = False
+            username = request.form.get("username")
+            password = request.form.get("password")
+            unwanted = ["(", ")", ";"]
+            for element in unwanted:
+                if element in username or element in password or username == "":
+                    session["logged"] = False
+                else:
+                    UserInfo = connection.run_queries(
+                        "SELECT * FROM USERS WHERE username='{username}' AND password='{password}'".format(
+                            username=username, password=password))
+                    if UserInfo != []:
+                        userTuple = UserInfo[0]
+                        session["username"] = userTuple[0]
+                        session["password"] = userTuple[1]
+                        session["logged"] = True
+                        session["pp"] = None
+                    else:
+                        session["logged"] = False
         signFail = False
         if request.form.get("action")=="Sign up":
 
@@ -240,6 +295,8 @@ def admin_page():
         return render_template('adminGet.html')
     if request.method == 'POST' and request.form['password']=="muazzam":
         return render_template('adminPost.html')
+    else:
+        return render_template('adminGet.html')
 
 
 @app.route("/moderation",methods=['POST'])
@@ -288,31 +345,28 @@ def moderation_page():
     if request.form["action"] == "tgroup_delete":
 
         moderation.delete_tgroup()
-
     connection = moderation.connection
     cities = connection.run_queries("SELECT name FROM CITIES")
     # Since there are changes the tables need to be updated after each moderation
     for c, in cities:
         # CATARGET
-        connection.run_statements(
-            "SELECT atarget, count(atarget) FROM attacks WHERE city = '{city}' GROUP BY atarget ORDER BY count DESC LIMIT 1".format(
-                city=c))
         try:
-            atarget, count = connection.cursor.fetchone()
+            atarget, count = connection.run_queries(
+            "SELECT atarget, count(atarget) FROM attacks WHERE city = '{city}' GROUP BY atarget ORDER BY count DESC LIMIT 1".format(
+                city=c))[0]
             connection.run_statements(
                 "UPDATE CITIES SET catarget = '{atarget}' WHERE name='{city}'".format(atarget=atarget, city=c))
-        except TypeError:
+        except IndexError:
             print("NOT A VALID QUERY WITH THE CITY:")
             print(c)
 
         # CATYPE
         try:
-            connection.run_statements(
+            atype, count =connection.run_queries(
                 "SELECT atype, count(atype) FROM attacks WHERE city = '{city}' GROUP BY atype ORDER BY count DESC LIMIT 1".format(
-                    city=c))
-            atype, count = connection.cursor.fetchone()
-            connection.cursor.execute(("UPDATE CITIES SET catype = '{atype}' WHERE name='{city}'").format(atype=atype, city=c))
-        except TypeError:
+                    city=c))[0]
+            connection.run_statements("UPDATE CITIES SET catype = '{atype}' WHERE name='{city}'".format(atype=atype, city=c))
+        except IndexError:
             print("NOT A VALID QUERY WITH THE CITY:")
             print(c)
 
@@ -321,23 +375,21 @@ def moderation_page():
     for t, in tgroups:
         # CATARGET
         try:
-            connection.run_statements(
+            atarget, count = connection.run_queries(
                 "SELECT atarget, count(atarget) FROM attacks WHERE tgroup = '{gname}' GROUP BY atarget ORDER BY count DESC LIMIT 1".format(
-                    gname=t))
-            atarget, count = connection.cursor.fetchone()
+                    gname=t))[0]
             connection.run_statements(
-                ("UPDATE TGROUPS SET catarget = '{atarget}' WHERE name='{gname}'").format(atarget=atarget, gname=t))
-        except TypeError:
+                "UPDATE TGROUPS SET catarget = '{atarget}' WHERE name='{gname}'".format(atarget=atarget, gname=t))
+        except IndexError:
             print("NOT A VALID QUERY")
 
         # CATYPE
         try:
-            connection.run_statements(
+            atype, count = connection.run_queries(
                 "SELECT atype, count(atype) FROM attacks WHERE tgroup = '{gname}' GROUP BY atype ORDER BY count DESC LIMIT 1".format(
-                    gname=t))
-            atype, count = connection.cursor.fetchone()
-            connection.run_statements(("UPDATE TGROUPS SET catype = '{atype}' WHERE name='{gname}'").format(atype=atype, gname=t))
-        except TypeError:
+                    gname=t))[0]
+            connection.run_statements("UPDATE TGROUPS SET catype = '{atype}' WHERE name='{gname}'".format(atype=atype, gname=t))
+        except IndexError:
             print("NOT A VALID QUERY")
 
     connection.commit()
