@@ -1,0 +1,243 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Attacks Table &#8212; ITUCSDB1840  documentation</title>
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Cities Table" href="../Cities/index.html" />
+    <link rel="prev" title="Developer Guide" href="../index.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../Cities/index.html" title="Cities Table"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../index.html" title="Developer Guide"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">ITUCSDB1840  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Developer Guide</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="attacks-table">
+<h1>Attacks Table<a class="headerlink" href="#attacks-table" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="create">
+<h2>Create<a class="headerlink" href="#create" title="Permalink to this headline">¶</a></h2>
+<p><strong>Attacks table is created in dbinit.py by adding the following statement to the init_statements list</strong></p>
+<blockquote>
+<div>“CREATE TABLE IF NOT EXISTS ATTACKS (ID SERIAL PRIMARY KEY,DATE DATE,CITY VARCHAR(30) REFERENCES CITIES(name) ON UPDATE CASCADE ON DELETE CASCADE,TGROUP VARCHAR(100) REFERENCES TGROUPS(name) ON UPDATE CASCADE ON DELETE CASCADE,atype VARCHAR(100),atarget VARCHAR(100),FATALITIES INTEGER,INJURIES INTEGER)”</div></blockquote>
+<p>Notice that we have ON DELETE CASCADE and ON UPDATE CASCADE for our foreign keys.</p>
+</div>
+<div class="section" id="add">
+<h2>Add<a class="headerlink" href="#add" title="Permalink to this headline">¶</a></h2>
+<p><strong>Adding an attack is handled in the add_attack() function of the Moderation Class</strong></p>
+<blockquote>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">add_attack</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">run_statements</span><span class="p">(</span>
+        <span class="s2">&quot;INSERT INTO ATTACKS(DATE,CITY,TGROUP,ATYPE,ATARGET,FATALITIES,INJURIES) VALUES(&#39;{date}&#39;,&#39;{city}&#39;,&#39;{gname}&#39;,&#39;{attacktype}&#39;,&#39;{target}&#39;,&#39;{fatalities}&#39;,&#39;{injuries}&#39;) ON CONFLICT DO NOTHING&quot;</span> \
+        <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">date</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s2">&quot;attack_date&quot;</span><span class="p">],</span> <span class="n">city</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s2">&quot;attack_city&quot;</span><span class="p">],</span>
+                <span class="n">gname</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s2">&quot;attack_tgroup&quot;</span><span class="p">],</span>
+                <span class="n">attacktype</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s2">&quot;attack_type&quot;</span><span class="p">],</span> <span class="n">target</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s2">&quot;attack_target&quot;</span><span class="p">],</span>
+                <span class="n">fatalities</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s2">&quot;attack_fatalities&quot;</span><span class="p">],</span> <span class="n">injuries</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s2">&quot;attack_injuries&quot;</span><span class="p">]))</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">run_statements</span><span class="p">(</span>
+        <span class="s2">&quot;UPDATE CITIES SET TOTALA = TOTALA+1,TOTALF = TOTALF + {fatalities},TOTALI = TOTALI + {injuries} WHERE NAME = &#39;{city}&#39;&quot;</span> \
+        <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">city</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s2">&quot;attack_city&quot;</span><span class="p">],</span> <span class="n">fatalities</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s2">&quot;attack_fatalities&quot;</span><span class="p">],</span>
+                <span class="n">injuries</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s2">&quot;attack_injuries&quot;</span><span class="p">]))</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">run_statements</span><span class="p">(</span>
+        <span class="s2">&quot;UPDATE TGROUPS SET TOTALA = TOTALA+1,TOTALF = TOTALF + {fatalities},TOTALI = TOTALI + {injuries} WHERE NAME = &#39;{gname}&#39;&quot;</span> \
+        <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">gname</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s2">&quot;attack_tgroup&quot;</span><span class="p">],</span> <span class="n">fatalities</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s2">&quot;attack_fatalities&quot;</span><span class="p">],</span>
+                <span class="n">injuries</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s2">&quot;attack_injuries&quot;</span><span class="p">]))</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>When adding an attack, first the attack is inserted into the attacks table. Then the city the attack was made in and the tgroup that made the attack gets updated.</p>
+</div>
+<div class="section" id="read">
+<h2>Read<a class="headerlink" href="#read" title="Permalink to this headline">¶</a></h2>
+<p><strong>Reading an attack happens in /attacks page</strong></p>
+<blockquote>
+<div></div></blockquote>
+<p>A connection to the database is established and the attacks are queried.Then a year range to display in the timespan filtering is passed to the template as parameters.
+Update
+——</p>
+<p><strong>Updating an attack is handled in the update_attack() function of the Moderation Class</strong></p>
+<blockquote>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">update_attack</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+    <span class="n">city</span><span class="p">,</span> <span class="n">fatalities</span><span class="p">,</span> <span class="n">injuries</span><span class="p">,</span> <span class="n">tgroup</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">run_queries</span><span class="p">(</span>
+        <span class="s2">&quot;SELECT city,fatalities,injuries,tgroup FROM ATTACKS where id={id};&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s2">&quot;attack_id&quot;</span><span class="p">]))[</span>
+        <span class="mi">0</span><span class="p">]</span>
+    <span class="n">difference_fatalities</span> <span class="o">=</span> <span class="n">fatalities</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s2">&quot;attack_fatalities&quot;</span><span class="p">])</span>
+    <span class="n">difference_injuries</span> <span class="o">=</span> <span class="n">injuries</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s2">&quot;attack_injuries&quot;</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">city</span> <span class="o">==</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s2">&quot;attack_city&quot;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">tgroup</span> <span class="o">==</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s2">&quot;attack_tgroup&quot;</span><span class="p">]:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">run_statements</span><span class="p">(</span>
+            <span class="s2">&quot;UPDATE CITIES SET TOTALF = TOTALF - {fatalities},TOTALI =  TOTALI - {injuries}  WHERE NAME = &#39;{city}&#39;&quot;</span> \
+                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fatalities</span><span class="o">=</span><span class="n">difference_fatalities</span><span class="p">,</span> <span class="n">injuries</span> <span class="o">=</span> <span class="n">difference_injuries</span><span class="p">,</span><span class="n">city</span> <span class="o">=</span> <span class="n">city</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">run_statements</span><span class="p">(</span>
+            <span class="s2">&quot;UPDATE TGROUPS SET TOTALF = TOTALF - {fatalities},TOTALI =  TOTALI - {injuries}  WHERE NAME = &#39;{tgroup}&#39;&quot;</span> \
+                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fatalities</span><span class="o">=</span><span class="n">difference_fatalities</span><span class="p">,</span> <span class="n">injuries</span><span class="o">=</span><span class="n">difference_injuries</span><span class="p">,</span> <span class="n">tgroup</span><span class="o">=</span><span class="n">tgroup</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">city</span> <span class="o">!=</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s2">&quot;attack_city&quot;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">tgroup</span> <span class="o">==</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s2">&quot;attack_tgroup&quot;</span><span class="p">]:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">run_statements</span><span class="p">(</span>
+            <span class="s2">&quot;UPDATE CITIES SET TOTALA = TOTALA-1,TOTALF = TOTALF - {fatalities},TOTALI =  TOTALI - {injuries}  WHERE NAME = &#39;{city}&#39;&quot;</span> \
+                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fatalities</span><span class="o">=</span><span class="n">fatalities</span><span class="p">,</span> <span class="n">injuries</span><span class="o">=</span><span class="n">injuries</span><span class="p">,</span> <span class="n">city</span><span class="o">=</span><span class="n">city</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">run_statements</span><span class="p">(</span>
+            <span class="s2">&quot;UPDATE CITIES SET TOTALA = TOTALA+1,TOTALF = TOTALF + {fatalities},TOTALI =  TOTALI + {injuries}  WHERE NAME = &#39;{city}&#39;&quot;</span> \
+                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fatalities</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s2">&quot;attack_fatalities&quot;</span><span class="p">],</span> <span class="n">injuries</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s2">&quot;attack_injuries&quot;</span><span class="p">],</span> <span class="n">city</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s2">&quot;attack_city&quot;</span><span class="p">]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">run_statements</span><span class="p">(</span>
+            <span class="s2">&quot;UPDATE TGROUPS SET TOTALF = TOTALF - {fatalities},TOTALI =  TOTALI - {injuries}  WHERE NAME = &#39;{tgroup}&#39;&quot;</span> \
+                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fatalities</span><span class="o">=</span><span class="n">difference_fatalities</span><span class="p">,</span> <span class="n">injuries</span><span class="o">=</span><span class="n">difference_injuries</span><span class="p">,</span> <span class="n">tgroup</span><span class="o">=</span><span class="n">tgroup</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">city</span> <span class="o">==</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s2">&quot;attack_city&quot;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">tgroup</span> <span class="o">!=</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s2">&quot;attack_tgroup&quot;</span><span class="p">]:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">run_statements</span><span class="p">(</span>
+            <span class="s2">&quot;UPDATE TGROUPS SET TOTALA = TOTALA-1,TOTALF = TOTALF - {fatalities},TOTALI =  TOTALI - {injuries}  WHERE NAME = &#39;{tgroup}&#39;&quot;</span> \
+                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fatalities</span><span class="o">=</span><span class="n">fatalities</span><span class="p">,</span> <span class="n">injuries</span><span class="o">=</span><span class="n">injuries</span><span class="p">,</span> <span class="n">tgroup</span><span class="o">=</span><span class="n">tgroup</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">run_statements</span><span class="p">(</span>
+            <span class="s2">&quot;UPDATE TGROUPS SET TOTALA = TOTALA+1,TOTALF = TOTALF + {fatalities},TOTALI =  TOTALI + {injuries}  WHERE NAME = &#39;{tgroup}&#39;&quot;</span> \
+                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fatalities</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s2">&quot;attack_fatalities&quot;</span><span class="p">],</span> <span class="n">injuries</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s2">&quot;attack_injuries&quot;</span><span class="p">],</span> <span class="n">tgroup</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s2">&quot;attack_tgroup&quot;</span><span class="p">]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">run_statements</span><span class="p">(</span>
+            <span class="s2">&quot;UPDATE CITIES SET TOTALF = TOTALF - {fatalities},TOTALI =  TOTALI - {injuries}  WHERE NAME = &#39;{city}&#39;&quot;</span> \
+                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fatalities</span><span class="o">=</span><span class="n">difference_fatalities</span><span class="p">,</span> <span class="n">injuries</span><span class="o">=</span><span class="n">difference_injuries</span><span class="p">,</span> <span class="n">city</span><span class="o">=</span><span class="n">city</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">city</span> <span class="o">!=</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s2">&quot;attack_city&quot;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">tgroup</span> <span class="o">!=</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s2">&quot;attack_tgroup&quot;</span><span class="p">]:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">run_statements</span><span class="p">(</span>
+            <span class="s2">&quot;UPDATE CITIES SET TOTALA = TOTALA-1,TOTALF = TOTALF - {fatalities},TOTALI =  TOTALI - {injuries}  WHERE NAME = &#39;{city}&#39;&quot;</span> \
+                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fatalities</span><span class="o">=</span><span class="n">fatalities</span><span class="p">,</span> <span class="n">injuries</span><span class="o">=</span><span class="n">injuries</span><span class="p">,</span> <span class="n">city</span><span class="o">=</span><span class="n">city</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">run_statements</span><span class="p">(</span>
+            <span class="s2">&quot;UPDATE CITIES SET TOTALA = TOTALA+1,TOTALF = TOTALF + {fatalities},TOTALI =  TOTALI + {injuries}  WHERE NAME = &#39;{city}&#39;&quot;</span> \
+                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fatalities</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s2">&quot;attack_fatalities&quot;</span><span class="p">],</span> <span class="n">injuries</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s2">&quot;attack_injuries&quot;</span><span class="p">],</span>
+                        <span class="n">city</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s2">&quot;attack_city&quot;</span><span class="p">]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">run_statements</span><span class="p">(</span>
+            <span class="s2">&quot;UPDATE TGROUPS SET TOTALA = TOTALA-1,TOTALF = TOTALF - {fatalities},TOTALI =  TOTALI - {injuries}  WHERE NAME = &#39;{tgroup}&#39;&quot;</span> \
+                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fatalities</span><span class="o">=</span><span class="n">fatalities</span><span class="p">,</span> <span class="n">injuries</span><span class="o">=</span><span class="n">injuries</span><span class="p">,</span> <span class="n">tgroup</span><span class="o">=</span><span class="n">tgroup</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">run_statements</span><span class="p">(</span>
+            <span class="s2">&quot;UPDATE TGROUPS SET TOTALA = TOTALA+1,TOTALF = TOTALF + {fatalities},TOTALI =  TOTALI + {injuries}  WHERE NAME = &#39;{tgroup}&#39;&quot;</span> \
+                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fatalities</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s2">&quot;attack_fatalities&quot;</span><span class="p">],</span> <span class="n">injuries</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s2">&quot;attack_injuries&quot;</span><span class="p">],</span>
+                        <span class="n">tgroup</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s2">&quot;attack_tgroup&quot;</span><span class="p">]))</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">run_statements</span><span class="p">(</span><span class="s2">&quot;UPDATE ATTACKS SET date=&#39;{date}&#39;,city=&#39;{city}&#39;,tgroup=&#39;{tgroup}&#39;,atype=&#39;{atype}&#39;,atarget=&#39;{atarget}&#39;,fatalities=&#39;{fatalities}&#39;,injuries=&#39;{injuries}&#39; WHERE id={id}&quot;</span>
+                                   <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">date</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s2">&quot;attack_date&quot;</span><span class="p">],</span><span class="n">city</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s2">&quot;attack_city&quot;</span><span class="p">],</span><span class="n">tgroup</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s2">&quot;attack_tgroup&quot;</span><span class="p">],</span><span class="n">atype</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s2">&quot;attack_type&quot;</span><span class="p">]</span>
+                                           <span class="p">,</span><span class="n">atarget</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s2">&quot;attack_target&quot;</span><span class="p">],</span><span class="n">fatalities</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s2">&quot;attack_fatalities&quot;</span><span class="p">],</span><span class="n">injuries</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s2">&quot;attack_injuries&quot;</span><span class="p">],</span><span class="nb">id</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s2">&quot;attack_id&quot;</span><span class="p">]))</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>What we do in update_attack() is, we first query for the attack being updated. Then we compare the updated attack data to the existing one.
+We then update the tables according to the differences between these 2 attacks.</p>
+</div>
+<div class="section" id="delete">
+<h2>Delete<a class="headerlink" href="#delete" title="Permalink to this headline">¶</a></h2>
+<p><strong>Deleting an attack is handled in the delete_attack() function of the Moderation Class</strong></p>
+<blockquote>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">delete_attack</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+    <span class="n">city</span><span class="p">,</span><span class="n">fatalities</span><span class="p">,</span><span class="n">injuries</span><span class="p">,</span><span class="n">tgroup</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">run_queries</span><span class="p">(</span><span class="s2">&quot;SELECT city,fatalities,injuries,tgroup FROM ATTACKS where id={id};&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s2">&quot;attack_id&quot;</span><span class="p">]))[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">run_statements</span><span class="p">(</span>
+        <span class="s2">&quot;UPDATE CITIES SET TOTALA = TOTALA-1,TOTALF = TOTALF - {fatalities},TOTALI = TOTALI - {injuries} WHERE NAME = &#39;{city}&#39;&quot;</span> \
+            <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">city</span><span class="o">=</span><span class="n">city</span><span class="p">,</span> <span class="n">fatalities</span><span class="o">=</span><span class="n">fatalities</span><span class="p">,</span>
+                    <span class="n">injuries</span><span class="o">=</span><span class="n">injuries</span><span class="p">))</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">run_statements</span><span class="p">(</span>
+        <span class="s2">&quot;UPDATE TGROUPS SET TOTALA = TOTALA-1,TOTALF = TOTALF - {fatalities},TOTALI = TOTALI - {injuries} WHERE NAME = &#39;{gname}&#39;&quot;</span> \
+            <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">gname</span><span class="o">=</span><span class="n">tgroup</span><span class="p">,</span> <span class="n">fatalities</span><span class="o">=</span><span class="n">fatalities</span><span class="p">,</span>
+                    <span class="n">injuries</span><span class="o">=</span><span class="n">injuries</span><span class="p">))</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">run_statements</span><span class="p">(</span>
+        <span class="s2">&quot;DELETE FROM ATTACKS WHERE id=&#39;{id}&#39;&quot;</span> \
+            <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s2">&quot;attack_id&quot;</span><span class="p">]))</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>When deleting an attack, first the existing attack is queried. Then the city the attack was made in and the tgroup that made the attack gets updated.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Attacks Table</a><ul>
+<li><a class="reference internal" href="#create">Create</a></li>
+<li><a class="reference internal" href="#add">Add</a></li>
+<li><a class="reference internal" href="#read">Read</a></li>
+<li><a class="reference internal" href="#delete">Delete</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../index.html"
+                        title="previous chapter">Developer Guide</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../Cities/index.html"
+                        title="next chapter">Cities Table</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/developer/Attacks/index.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../Cities/index.html" title="Cities Table"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../index.html" title="Developer Guide"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">ITUCSDB1840  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Developer Guide</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, ITUCSDB1840.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.3.
+    </div>
+  </body>
+</html>

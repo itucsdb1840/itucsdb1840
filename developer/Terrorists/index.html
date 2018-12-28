@@ -1,0 +1,191 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Terrorist Groups Table &#8212; ITUCSDB1840  documentation</title>
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Extra Tables" href="../extras/index.html" />
+    <link rel="prev" title="Cities Table" href="../Cities/index.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../extras/index.html" title="Extra Tables"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../Cities/index.html" title="Cities Table"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">ITUCSDB1840  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Developer Guide</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="terrorist-groups-table">
+<h1>Terrorist Groups Table<a class="headerlink" href="#terrorist-groups-table" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="create">
+<h2>Create<a class="headerlink" href="#create" title="Permalink to this headline">¶</a></h2>
+<p><strong>Tgroups table is created in dbinit.py by adding the following statement to the init_statements list</strong></p>
+<blockquote>
+<div>“CREATE TABLE IF NOT EXISTS TGROUPS (NAME VARCHAR(100) PRIMARY KEY,TOTALA INTEGER DEFAULT 0,TOTALI INTEGER DEFAULT 0,TOTALF INTEGER DEFAULT 0,CATARGET VARCHAR(100),CATYPE VARCHAR(100))”,</div></blockquote>
+</div>
+<div class="section" id="add">
+<h2>Add<a class="headerlink" href="#add" title="Permalink to this headline">¶</a></h2>
+<p><strong>Adding a tgroup is handled in the add_tgroup() function of the Moderation Class</strong></p>
+<blockquote>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">add_tgroup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+  <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">run_statements</span><span class="p">(</span><span class="s2">&quot;INSERT INTO TGROUPS(NAME) VALUES(&#39;{name}&#39;) ON CONFLICT DO NOTHING &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;tgroup_name&#39;</span><span class="p">]))</span>
+  <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>ON CONFLICT DO NOTHING allows us to avoid errors when trying to add an existing tgroup.</p>
+</div>
+<div class="section" id="read">
+<h2>Read<a class="headerlink" href="#read" title="Permalink to this headline">¶</a></h2>
+<p><strong>Reading a city happens in /tgroups page</strong></p>
+<blockquote>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@app.route</span><span class="p">(</span><span class="s2">&quot;/tgroups&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">tgroups_page</span><span class="p">():</span>
+    <span class="n">connection</span> <span class="o">=</span> <span class="n">DatabaseConnection</span><span class="p">()</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;DATABASE_URL&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">url</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;postgres://itucs:itucspw@localhost:32768/itucsdb&#39;</span>
+    <span class="n">connection</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+    <span class="n">tgroups</span> <span class="o">=</span> <span class="n">connection</span><span class="o">.</span><span class="n">run_queries</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM TGROUPS;&quot;</span><span class="p">)</span>
+    <span class="n">connection</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;tgroups.html&#39;</span><span class="p">,</span><span class="n">tuples</span><span class="o">=</span><span class="n">tgroups</span><span class="p">)</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>A connection to the database is established and the tgroups are queried and passed to the template as parameters.</p>
+</div>
+<div class="section" id="update">
+<h2>Update<a class="headerlink" href="#update" title="Permalink to this headline">¶</a></h2>
+<p><strong>Updating a tgroup is handled in the update_tgroup() function of the Moderation Class</strong></p>
+<blockquote>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">update_tgroup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+  <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">run_statements</span><span class="p">(</span><span class="s2">&quot;UPDATE TGROUPS SET name=&#39;{new_name}&#39; WHERE name=&#39;{name}&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">new_name</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s2">&quot;tgroup_new_name&quot;</span><span class="p">],</span><span class="n">name</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s2">&quot;tgroup_name&quot;</span><span class="p">]))</span>
+  <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>Notice that we only update the name of the tgroup. As the rest of it’s attributes are always automatically calculated elsewhere.</p>
+</div>
+<div class="section" id="delete">
+<h2>Delete<a class="headerlink" href="#delete" title="Permalink to this headline">¶</a></h2>
+<p><strong>Deleting a tgroup is handled in the delete_tgroup() function of the Moderation Class</strong></p>
+<blockquote>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">delete_tgroup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+    <span class="n">attacks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">run_queries</span><span class="p">(</span>
+        <span class="s2">&quot;SELECT city,fatalities,injuries FROM ATTACKS WHERE tgroup=&#39;{tgroup}&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tgroup</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;tgroup_name&#39;</span><span class="p">]))</span>
+    <span class="k">for</span> <span class="n">attack</span> <span class="ow">in</span> <span class="n">attacks</span><span class="p">:</span>
+        <span class="n">city</span><span class="p">,</span> <span class="n">fatalities</span><span class="p">,</span> <span class="n">injuries</span> <span class="o">=</span> <span class="n">attack</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">run_statements</span><span class="p">(</span>
+            <span class="s2">&quot;UPDATE CITIES SET totala = totala-1, totalf = totalf - {fatalities}, totali = totali - {injuries} WHERE name = &#39;{city}&#39;&quot;</span>
+            <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">city</span><span class="o">=</span><span class="n">city</span><span class="p">,</span> <span class="n">fatalities</span><span class="o">=</span><span class="n">fatalities</span><span class="p">,</span> <span class="n">injuries</span><span class="o">=</span><span class="n">injuries</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">run_statements</span><span class="p">(</span>
+            <span class="s2">&quot;DELETE FROM tgroups WHERE name=&#39;{tgroup}&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tgroup</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s2">&quot;tgroup_name&quot;</span><span class="p">]))</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>When deleting a tgroup we have to first query the attacks that have been made by that tgroup.Then for each attack we need to update the data of the cities that the attacks were made in as if we just deleted the attack.
+This is necessary in order to keep the data correct.The reason is that we have ON DELETE CASCADE for tgroup foreign keys which means we will automatically delete every attack that was made by that tgroup when we delete a tgroup.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Terrorist Groups Table</a><ul>
+<li><a class="reference internal" href="#create">Create</a></li>
+<li><a class="reference internal" href="#add">Add</a></li>
+<li><a class="reference internal" href="#read">Read</a></li>
+<li><a class="reference internal" href="#update">Update</a></li>
+<li><a class="reference internal" href="#delete">Delete</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../Cities/index.html"
+                        title="previous chapter">Cities Table</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../extras/index.html"
+                        title="next chapter">Extra Tables</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/developer/Terrorists/index.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../extras/index.html" title="Extra Tables"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../Cities/index.html" title="Cities Table"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">ITUCSDB1840  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Developer Guide</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, ITUCSDB1840.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.3.
+    </div>
+  </body>
+</html>
