@@ -16,6 +16,3 @@ User Guide
    Profile
    Suggestion
 
-      .. figure:: /figures/picture.png
-
-      This is the caption of the figure (a simple paragraph).

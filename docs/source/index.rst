@@ -20,7 +20,7 @@ Welcome to the documentation of Turkey Terrorism Database!
 Contents:
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
    user/index
    developer/index
